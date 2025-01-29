@@ -1,4 +1,4 @@
-enum ProjectStatus  {
+enum ProjectStatus {
     ACTIVE,
     FINISHED
 }
@@ -100,7 +100,8 @@ class ProjectList {
         this.element.id = `${this.type}-projects`;
 
         projectState.addListener((projects: Project[]) => {
-            this.assignedProject = projects;
+            const relevantProject = projects.filter(project => this.type === 'active' ? project.status === ProjectStatus.ACTIVE : project.status === ProjectStatus.FINISHED);
+            this.assignedProject = relevantProject;
             this.renderProjects();
         })
 
@@ -110,6 +111,7 @@ class ProjectList {
 
     private renderProjects() {
         const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
+        listEl.innerHTML = '';
         for (const projectItem of this.assignedProject) {
             const listItem = document.createElement('li');
             listItem.textContent = projectItem.title;
@@ -172,7 +174,6 @@ class ProjectInput {
             max: 5,
         };
 
-        // console.log(!validate(titleValidatable) , !validate(descriptionValidatable) , !validate(peopleValidatable))
         if (!validate(titleValidatable) || !validate(descriptionValidatable) || !validate(peopleValidatable)) {
             alert('Not valid input!');
             return;
