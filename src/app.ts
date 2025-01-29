@@ -5,6 +5,7 @@ enum ProjectStatus {
 
 class Project {
     constructor(public id: string, public title: string, public description: string, public people: number, public status: ProjectStatus) {
+
     }
 }
 
@@ -18,7 +19,7 @@ class State<T> {
     }
 }
 
-class ProjectState extends State <Project>{
+class ProjectState extends State <Project> {
     private projects: Project[] = [];
     private static instance: ProjectState;
 
@@ -114,6 +115,36 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     abstract renderContent(): void;
 }
 
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+    private project: Project;
+
+    get persons(): any {
+        if (this.project.people === 1) {
+            return '1 person.';
+        } else {
+            return `${this.project.people} persons.`;
+        }
+    }
+
+    constructor(hostId: string, project: Project) {
+        super('single-project', hostId, false, project.id);
+        this.project = project;
+
+        this.configure();
+        this.renderContent();
+    }
+
+    configure() {
+
+    }
+
+    renderContent() {
+        this.element.querySelector('h2')!.textContent = this.project.title;
+        this.element.querySelector('h3')!.textContent = this.persons;
+        this.element.querySelector('p')!.textContent = this.project.description;
+    }
+}
+
 class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     assignedProject: Project[];
 
@@ -145,9 +176,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
         const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
         listEl.innerHTML = '';
         for (const projectItem of this.assignedProject) {
-            const listItem = document.createElement('li');
-            listItem.textContent = projectItem.title;
-            listEl.appendChild(listItem);
+            new ProjectItem(this.element.querySelector('ul')!.id, projectItem);
         }
     }
 }
